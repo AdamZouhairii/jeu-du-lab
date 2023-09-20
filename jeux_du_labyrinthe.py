@@ -15,8 +15,8 @@ blanc = (255, 255, 255)
 class Joueur(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((30, 30))  
-        self.image.fill(blanc)
+        self.image = pygame.Surface((30, 30))
+        self.image.fill(noir)
         self.rect = self.image.get_rect()
         self.rect.center = (largeur // 2, hauteur // 2)
         self.vitesse = 3
@@ -24,7 +24,7 @@ class Joueur(pygame.sprite.Sprite):
 class Labyrinthe:
     def __init__(self):
         self.grille = [
-            "XXXXXXXXXXXXXXWWXXXX",
+            "XXXXXXXXXXXXXX XXXX",
             "X     X           X",
             "X XXXXX XXXXXXX XXX",
             "X X   X       XXXXX",
@@ -37,7 +37,6 @@ class Labyrinthe:
             "XXXXXXXXXXXXXX  XXX",
         ]
 
-
 def afficher_labyrinthe(labyrinthe, fenetre):
     for ligne, row in enumerate(labyrinthe.grille):
         for col, case in enumerate(row):
@@ -45,7 +44,16 @@ def afficher_labyrinthe(labyrinthe, fenetre):
                 pygame.draw.rect(fenetre, noir, (col * 40, ligne * 40, 40, 40))
             elif case == " ":
                 pygame.draw.rect(fenetre, blanc, (col * 40, ligne * 40, 40, 40))
-                # code pour les espaces vides
+
+def collision_avec_murs(joueur_temp_rect, labyrinthe):
+    for ligne, row in enumerate(labyrinthe.grille):
+        for col, case in enumerate(row):
+            if case == "X":
+                mur_rect = pygame.Rect(col * 40, ligne * 40, 40, 40)
+                if joueur_temp_rect.colliderect(mur_rect):
+                    return True
+    return False
+
 
 def main():
     labyrinthe = Labyrinthe()
@@ -60,14 +68,24 @@ def main():
                 sys.exit()
 
         touches = pygame.key.get_pressed()
+        joueur_x, joueur_y = joueur.rect.x, joueur.rect.y
+
         if touches[pygame.K_LEFT]:
-            joueur.rect.x -= joueur.vitesse
+            joueur_x -= joueur.vitesse
         if touches[pygame.K_RIGHT]:
-            joueur.rect.x += joueur.vitesse
+            joueur_x += joueur.vitesse
         if touches[pygame.K_UP]:
-            joueur.rect.y -= joueur.vitesse
+            joueur_y -= joueur.vitesse
         if touches[pygame.K_DOWN]:
-            joueur.rect.y += joueur.vitesse
+            joueur_y += joueur.vitesse
+
+        # Créez un nouveau rect temporaire pour le joueur(adam)
+        joueur_temp_rect = joueur.rect.copy()
+        joueur_temp_rect.x = joueur_x
+        joueur_temp_rect.y = joueur_y
+
+        if not collision_avec_murs(joueur_temp_rect, labyrinthe):
+            joueur.rect = joueur_temp_rect
 
         fenetre.fill((0, 0, 0))
         afficher_labyrinthe(labyrinthe, fenetre)
@@ -78,4 +96,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
