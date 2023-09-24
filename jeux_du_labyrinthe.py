@@ -1,11 +1,14 @@
-import pygame
-import sys
+import pygame,sys,random
 
 pygame.init()
 
 largeur, hauteur = 800, 600
 
 fenetre = pygame.display.set_mode((largeur, hauteur))
+
+icon = pygame.image.load('labyrinthe.png')
+
+pygame.display.set_icon(icon)
 
 pygame.display.set_caption("Jeu du Labyrinthe")
 
@@ -27,9 +30,9 @@ class Labyrinthe:
             "XXXXXXXXXXXXXX XXXX",
             "X     X           X",
             "X XXXXX XXXXXXX XXX",
-            "X X   X       XXXXX",
+            "X X O X       XXXXX",
             "X X XXX XXXXX XXXxX",
-            "X X X       X X   X",
+            "X X X     O  X X   X",
             "X X XXXXXXX X XXXxX",
             "X X         X     X",
             "X XXXXXXXXX XXXXXxX",
@@ -79,7 +82,7 @@ def main():
         if touches[pygame.K_DOWN]:
             joueur_y += joueur.vitesse
 
-        # Créez un nouveau rect temporaire pour le joueur(adam)
+        # Créez un nouveau rect temporaire pour le joueur(adam oublie pas)
         joueur_temp_rect = joueur.rect.copy()
         joueur_temp_rect.x = joueur_x
         joueur_temp_rect.y = joueur_y
