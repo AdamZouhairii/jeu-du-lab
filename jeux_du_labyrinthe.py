@@ -6,20 +6,20 @@ largeur, hauteur = 800, 600
 
 fenetre = pygame.display.set_mode((largeur, hauteur))
 
-icon = pygame.image.load('labyrinthe.png')
+icon = pygame.image.load('C:/Users/Adame/Desktop/jeu du lab/labyrinthe.png')
 
 pygame.display.set_icon(icon)
 
 pygame.display.set_caption("Jeu du Labyrinthe")
-
+rouge= (255, 0, 0)
 noir = (0, 0, 0)
 blanc = (255, 255, 255)
 
 class Joueur(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((30, 30))
-        self.image.fill(noir)
+        self.image = pygame.Surface((32, 32))
+        self.image.fill(rouge)
         self.rect = self.image.get_rect()
         self.rect.center = (largeur // 2, hauteur // 2)
         self.vitesse = 3
@@ -31,11 +31,11 @@ class Labyrinthe:
             "X     X           X",
             "X XXXXX XXXXXXX XXX",
             "X X O X       XXXXX",
-            "X X XXX XXXXX XXXxX",
-            "X X X     O  X X   X",
-            "X X XXXXXXX X XXXxX",
+            "X X XXX XXXXX XXXXX",
+            "X X X     O    X  X",
+            "X X XXXXXXX X XXXXX",
             "X X         X     X",
-            "X XXXXXXXXX XXXXXxX",
+            "X XXXXXXXXX XXXXX X",
             "X                 X",
             "XXXXXXXXXXXXXX  XXX",
         ]
