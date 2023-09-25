@@ -1,33 +1,30 @@
-import pygame,sys,random
+import pygame
+import sys
 
 pygame.init()
 
 largeur, hauteur = 800, 600
-
 fenetre = pygame.display.set_mode((largeur, hauteur))
-
-icon = pygame.image.load('C:/Users/Adame/Desktop/jeu du lab/labyrinthe.png')
-
-pygame.display.set_icon(icon)
-
 pygame.display.set_caption("Jeu du Labyrinthe")
-rouge= (255, 0, 0)
+
+rouge = (255, 0, 0)
 noir = (0, 0, 0)
 blanc = (255, 255, 255)
 
 class Joueur(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,x=560 ,y=410):
         super().__init__()
         self.image = pygame.Surface((32, 32))
         self.image.fill(rouge)
         self.rect = self.image.get_rect()
-        self.rect.center = (largeur // 2, hauteur // 2)
+        self.rect.x = x
+        self.rect.y = y
         self.vitesse = 3
 
 class Labyrinthe:
     def __init__(self):
         self.grille = [
-            "XXXXXXXXXXXXXX XXXX",
+            "XXXXXXXXXXXXXXVXXXX",
             "X     X           X",
             "X XXXXX XXXXXXX XXX",
             "X X O X       XXXXX",
@@ -37,7 +34,7 @@ class Labyrinthe:
             "X X         X     X",
             "X XXXXXXXXX XXXXX X",
             "X                 X",
-            "XXXXXXXXXXXXXX  XXX",
+            "XXXXXXXXXXXXXXDXXXX",
         ]
 
 def afficher_labyrinthe(labyrinthe, fenetre):
@@ -57,10 +54,19 @@ def collision_avec_murs(joueur_temp_rect, labyrinthe):
                     return True
     return False
 
+def victoire(joueur_rect, labyrinthe):
+    for ligne, row in enumerate(labyrinthe.grille):
+        for col, case in enumerate(row):
+            if case == "V":
+                victoire_rect = pygame.Rect(col * 40, ligne * 40, 40, 40)
+                if joueur_rect.colliderect(victoire_rect):
+                    return True
+    return False
 
 def main():
     labyrinthe = Labyrinthe()
     joueur = Joueur()
+    victoire_affichee = False
 
     clock = pygame.time.Clock()
 
@@ -82,7 +88,6 @@ def main():
         if touches[pygame.K_DOWN]:
             joueur_y += joueur.vitesse
 
-        # Créez un nouveau rect temporaire pour le joueur(adam oublie pas)
         joueur_temp_rect = joueur.rect.copy()
         joueur_temp_rect.x = joueur_x
         joueur_temp_rect.y = joueur_y
@@ -93,6 +98,10 @@ def main():
         fenetre.fill((0, 0, 0))
         afficher_labyrinthe(labyrinthe, fenetre)
         fenetre.blit(joueur.image, joueur.rect)
+
+        if victoire(joueur.rect, labyrinthe) and not victoire_affichee:
+            print("Victoire !")
+            victoire_affichee = True
 
         pygame.display.flip()
         clock.tick(60)
