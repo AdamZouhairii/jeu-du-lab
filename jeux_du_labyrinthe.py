@@ -1,10 +1,13 @@
 import pygame
 import sys
+import pygame.font
 
 pygame.init()
 
 largeur, hauteur = 800, 600
 fenetre = pygame.display.set_mode((largeur, hauteur))
+pygame_icon = pygame.image.load("C:/Users/Adame/Desktop/jeu du lab/labyrinthe.png")
+pygame.display.set_icon(pygame_icon)
 pygame.display.set_caption("Jeu du Labyrinthe")
 
 rouge = (255, 0, 0)
@@ -63,10 +66,16 @@ def victoire(joueur_rect, labyrinthe):
                     return True
     return False
 
+def afficher_message_victoire(fenetre):
+    font = pygame.font.Font(None, 36)
+    text = font.render("Victoire !", True, (200,200,200))
+    fenetre.blit(text,(300,250))
+
 def main():
     labyrinthe = Labyrinthe()
     joueur = Joueur()
     victoire_affichee = False
+    victoire_timer=None
 
     clock = pygame.time.Clock()
 
@@ -100,11 +109,59 @@ def main():
         fenetre.blit(joueur.image, joueur.rect)
 
         if victoire(joueur.rect, labyrinthe) and not victoire_affichee:
-            print("Victoire !")
             victoire_affichee = True
+            victoire_timer = pygame.time.get_ticks()
+
+        if victoire_affichee:
+            if pygame.time.get_ticks()-victoire_timer>= 1000:
+                pygame.quit()
+                sys.exit()
+            else:
+                afficher_message_victoire(fenetre)
 
         pygame.display.flip()
         clock.tick(60)
 
+def menu():
+    while True:
+        # Gestion des événements Pygame
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # Affichage du menu
+        fenetre.fill((0, 0, 0))
+        font = pygame.font.Font(None, 36)
+        
+        # Modifier le titre
+        title_text = font.render("Labyrinthe", True, (255, 255, 255))
+        fenetre.blit(title_text, (largeur/2 - title_text.get_width()/2, 50))
+        
+        # Ajouter un bouton "Jouer"
+        jouer_text = font.render("Jouer", True, (255, 255, 255))
+        jouer_rect = jouer_text.get_rect(center=(largeur/2, 150))
+        fenetre.blit(jouer_text, jouer_rect)
+
+        # Ajouter un bouton "Quitter"
+        quitter_text = font.render("Quitter", True, (255, 0, 0))
+        quitter_rect = quitter_text.get_rect(center=(largeur/2, 200))
+        fenetre.blit(quitter_text, quitter_rect)
+
+        # Vérification des clics de souris
+        mx, my = pygame.mouse.get_pos()
+
+        if jouer_rect.collidepoint((mx, my)):
+            if pygame.mouse.get_pressed()[0] == 1:
+                main()  # Lancer la fonction main()
+
+        if quitter_rect.collidepoint((mx, my)):
+            if pygame.mouse.get_pressed()[0] == 1:
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.update()
+
+
 if __name__ == "__main__":
-    main()
+    menu()
