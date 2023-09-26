@@ -47,6 +47,8 @@ def afficher_labyrinthe(labyrinthe, fenetre):
                 pygame.draw.rect(fenetre, noir, (col * 40, ligne * 40, 40, 40))
             elif case == " ":
                 pygame.draw.rect(fenetre, blanc, (col * 40, ligne * 40, 40, 40))
+            elif case == "V":
+                pygame.draw.rect(fenetre, rouge, (col * 40, ligne * 40, 40, 40))
 
 def collision_avec_murs(joueur_temp_rect, labyrinthe):
     for ligne, row in enumerate(labyrinthe.grille):
