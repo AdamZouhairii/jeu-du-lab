@@ -189,7 +189,7 @@ def main():
                 afficher_message_victoire(fenetre)
 
         if game_over_affiche:
-            if pygame.time.get_ticks() - game_over_timer >= 1000:
+            if pygame.time.get_ticks() - game_over_timer >= 500:
                 # Redémarrer le jeu après 1 seconde
                 game_over_affiche = False
                 joueur.rect.x = 560
