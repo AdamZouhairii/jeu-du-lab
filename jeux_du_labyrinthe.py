@@ -39,7 +39,7 @@ class Labyrinthe:
             "X XXXXX XXXXXXX XXX",
             "X X O X       XXXXX",
             "X X XXX XXXXX XXXXX",
-            "X X X     O       X",
+            "X X X     O  P    X",
             "X X XXXXXXX   XXXXX",
             "X X         X     X",
             "X XXXXXXXXX XXXXX X",
@@ -61,6 +61,8 @@ def afficher_labyrinthe(labyrinthe, fenetre):
                 pygame.draw.rect(fenetre, rouge, (col * 40, ligne * 40, 40, 40))
             elif case == "O":
                 pygame.draw.rect(fenetre, bleu, (col * 40, ligne * 40, 40, 40))
+            elif case == "P":
+                pygame.draw.rect(fenetre, blanc, (col * 40, ligne * 40, 40, 40))
 
 
 
@@ -71,6 +73,15 @@ def collision_avec_murs(joueur_temp_rect, labyrinthe):
             if case == "X":
                 mur_rect = pygame.Rect(col * 40, ligne * 40, 40, 40)
                 if joueur_temp_rect.colliderect(mur_rect):
+                    return True
+    return False
+
+def collision_avec_piege(joueur_rect, labyrinthe):
+    for ligne, row in enumerate(labyrinthe.grille):
+        for col, case in enumerate(row):
+            if case == "P":
+                piege_rect = pygame.Rect(col * 40, ligne * 40, 40, 40)
+                if joueur_rect.colliderect(piege_rect):
                     return True
     return False
 
@@ -164,7 +175,14 @@ def main():
         joueur_temp_rect.x = joueur_x
         joueur_temp_rect.y = joueur_y
 
-        if not collision_avec_murs(joueur_temp_rect, labyrinthe):
+        if collision_avec_piege(joueur_temp_rect, labyrinthe):
+        # Le joueur a marché sur le piège, afficher "Perdu !" et redémarrer le jeu
+            game_over_affiche = True
+            game_over_timer = pygame.time.get_ticks()
+            joueur.rect.x = 560
+            joueur.rect.y = 410
+
+        elif not collision_avec_murs(joueur_temp_rect, labyrinthe):
             joueur.rect = joueur_temp_rect
         else:
             # Le joueur a touché un mur, afficher "Perdu !" et redémarrer le jeu
