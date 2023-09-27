@@ -1,7 +1,7 @@
 import pygame
 import sys
 import pygame.font
-
+# Adam.z et Rawad
 # Initialisation de Pygame
 pygame.init()
 
@@ -21,7 +21,7 @@ bleu = (0, 0, 150)
 class Joueur(pygame.sprite.Sprite):
     def __init__(self, x=560, y=410):
         super().__init__()
-        self.image = pygame.Surface((32, 32))
+        self.image = pygame.Surface((25, 25))
         self.image.fill(rouge)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -39,8 +39,8 @@ class Labyrinthe:
             "X XXXXX XXXXXXX XXX",
             "X X O X       XXXXX",
             "X X XXX XXXXX XXXXX",
-            "X X X     O    X  X",
-            "X X XXXXXXX X XXXXX",
+            "X X X     O       X",
+            "X X XXXXXXX   XXXXX",
             "X X         X     X",
             "X XXXXXXXXX XXXXX X",
             "X                 X",
@@ -59,6 +59,8 @@ def afficher_labyrinthe(labyrinthe, fenetre):
                 pygame.draw.rect(fenetre, blanc, (col * 40, ligne * 40, 40, 40))
             elif case == "V":
                 pygame.draw.rect(fenetre, rouge, (col * 40, ligne * 40, 40, 40))
+            elif case == "O":
+                pygame.draw.rect(fenetre, bleu, (col * 40, ligne * 40, 40, 40))
 
 
 
@@ -123,12 +125,20 @@ def resoudre_labyrinthe(labyrinthe, joueur_rect):
         labyrinthe.grille[i] = "".join(grid[i])
 
 
+# Fonction pour afficher "Perdu !"
+def afficher_message_perdu(fenetre):
+    font = pygame.font.Font(None, 36)
+    text = font.render("Perdu !", True, (230, 0, 0))  # Couleur rouge pour "Perdu !"
+    fenetre.blit(text, (300, 250))
+
 # Fonction principale du jeu
 def main():
     labyrinthe = Labyrinthe()
     joueur = Joueur()
     victoire_affichee = False
+    game_over_affiche = False
     victoire_timer = None
+    game_over_timer = None
 
     clock = pygame.time.Clock()
 
@@ -156,6 +166,12 @@ def main():
 
         if not collision_avec_murs(joueur_temp_rect, labyrinthe):
             joueur.rect = joueur_temp_rect
+        else:
+            # Le joueur a touché un mur, afficher "Perdu !" et redémarrer le jeu
+            game_over_affiche = True
+            game_over_timer = pygame.time.get_ticks()
+            joueur.rect.x = 560
+            joueur.rect.y = 410
 
         fenetre.fill((0, 0, 0))
         afficher_labyrinthe(labyrinthe, fenetre)
@@ -172,7 +188,18 @@ def main():
             else:
                 afficher_message_victoire(fenetre)
 
-        if touches[pygame.K_h]:  
+        if game_over_affiche:
+            if pygame.time.get_ticks() - game_over_timer >= 1000:
+                # Redémarrer le jeu après 1 seconde
+                game_over_affiche = False
+                joueur.rect.x = 560
+                joueur.rect.y = 410
+                # Afficher "Perdu !" pendant 1 seconde
+                afficher_message_perdu(fenetre)
+                pygame.display.flip()
+                pygame.time.wait(1000)  # Attendre 1 seconde
+
+        if touches[pygame.K_h]:
             resoudre_labyrinthe(labyrinthe, joueur.rect)
 
         pygame.display.flip()
