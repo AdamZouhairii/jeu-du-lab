@@ -2,16 +2,22 @@ import pygame
 import sys
 import pygame.font
 
+# Initialisation de Pygame
 pygame.init()
+
+# Définition de la taille de la fenêtre
 largeur, hauteur = 800, 600
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Jeu du Labyrinthe")
 
+# Définition des couleurs
 rouge = (255, 0, 0)
 noir = (0, 0, 0)
 blanc = (255, 255, 255)
 bleu = (0, 0, 150)
 
+
+# Classe du joueur
 class Joueur(pygame.sprite.Sprite):
     def __init__(self, x=560, y=410):
         super().__init__()
@@ -22,6 +28,9 @@ class Joueur(pygame.sprite.Sprite):
         self.rect.y = y
         self.vitesse = 3
 
+
+
+# Classe du labyrinthe
 class Labyrinthe:
     def __init__(self):
         self.grille = [
@@ -38,6 +47,9 @@ class Labyrinthe:
             "XXXXXXXXXXXXXXDXXXX",
         ]
 
+
+
+# Fonction pour afficher le labyrinthe
 def afficher_labyrinthe(labyrinthe, fenetre):
     for ligne, row in enumerate(labyrinthe.grille):
         for col, case in enumerate(row):
@@ -48,6 +60,9 @@ def afficher_labyrinthe(labyrinthe, fenetre):
             elif case == "V":
                 pygame.draw.rect(fenetre, rouge, (col * 40, ligne * 40, 40, 40))
 
+
+
+# Fonction pour détecter la collision avec les murs
 def collision_avec_murs(joueur_temp_rect, labyrinthe):
     for ligne, row in enumerate(labyrinthe.grille):
         for col, case in enumerate(row):
@@ -57,6 +72,8 @@ def collision_avec_murs(joueur_temp_rect, labyrinthe):
                     return True
     return False
 
+
+# Fonction pour détecter la victoire
 def victoire(joueur_rect, labyrinthe):
     for ligne, row in enumerate(labyrinthe.grille):
         for col, case in enumerate(row):
@@ -66,11 +83,16 @@ def victoire(joueur_rect, labyrinthe):
                     return True
     return False
 
+
+
+# Fonction pour afficher un message de victoire
 def afficher_message_victoire(fenetre):
     font = pygame.font.Font(None, 36)
     text = font.render("Victoire !", True, (230, 230, 230))
     fenetre.blit(text, (300, 250))
 
+
+# Fonction pour résoudre le labyrinthe
 def resoudre_labyrinthe(labyrinthe, joueur_rect):
     def dfs(x, y):
         if x < 0 or x >= len(grid) or y < 0 or y >= len(grid[0]) or grid[x][y] == "X" or grid[x][y] == "P":
@@ -100,6 +122,8 @@ def resoudre_labyrinthe(labyrinthe, joueur_rect):
     for i in range(len(labyrinthe.grille)):
         labyrinthe.grille[i] = "".join(grid[i])
 
+
+# Fonction principale du jeu
 def main():
     labyrinthe = Labyrinthe()
     joueur = Joueur()
@@ -154,6 +178,9 @@ def main():
         pygame.display.flip()
         clock.tick(60)
 
+
+
+# Fonction du menu principal
 def menu():
     while True:
         for event in pygame.event.get():
@@ -188,5 +215,6 @@ def menu():
 
         pygame.display.update()
 
+# Lance le code menu
 if __name__ == "__main__":
     menu()
