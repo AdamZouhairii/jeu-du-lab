@@ -3,19 +3,17 @@ import sys
 import pygame.font
 
 pygame.init()
-
 largeur, hauteur = 800, 600
 fenetre = pygame.display.set_mode((largeur, hauteur))
-pygame_icon = pygame.image.load("C:/Users/Adame/Desktop/jeu du lab/labyrinthe.png")
-pygame.display.set_icon(pygame_icon)
 pygame.display.set_caption("Jeu du Labyrinthe")
 
 rouge = (255, 0, 0)
 noir = (0, 0, 0)
 blanc = (255, 255, 255)
+bleu = (0, 0, 150)
 
 class Joueur(pygame.sprite.Sprite):
-    def __init__(self,x=560 ,y=410):
+    def __init__(self, x=560, y=410):
         super().__init__()
         self.image = pygame.Surface((32, 32))
         self.image.fill(rouge)
@@ -44,7 +42,7 @@ def afficher_labyrinthe(labyrinthe, fenetre):
     for ligne, row in enumerate(labyrinthe.grille):
         for col, case in enumerate(row):
             if case == "X":
-                pygame.draw.rect(fenetre, noir, (col * 40, ligne * 40, 40, 40))
+                pygame.draw.rect(fenetre, bleu, (col * 40, ligne * 40, 40, 40))
             elif case == " ":
                 pygame.draw.rect(fenetre, blanc, (col * 40, ligne * 40, 40, 40))
             elif case == "V":
@@ -70,14 +68,43 @@ def victoire(joueur_rect, labyrinthe):
 
 def afficher_message_victoire(fenetre):
     font = pygame.font.Font(None, 36)
-    text = font.render("Victoire !", True, (200,200,200))
-    fenetre.blit(text,(300,250))
+    text = font.render("Victoire !", True, (230, 230, 230))
+    fenetre.blit(text, (300, 250))
+
+def resoudre_labyrinthe(labyrinthe, joueur_rect):
+    def dfs(x, y):
+        if x < 0 or x >= len(grid) or y < 0 or y >= len(grid[0]) or grid[x][y] == "X" or grid[x][y] == "P":
+            return False
+        if grid[x][y] == "V":
+            return True
+        grid[x][y] = "P"  
+
+       
+        if dfs(x - 1, y) or dfs(x + 1, y) or dfs(x, y - 1) or dfs(x, y + 1):
+            return True
+
+        return False
+
+   
+    grid = [list(row) for row in labyrinthe.grille]
+
+    x = joueur_rect.y // 40
+    y = joueur_rect.x // 40
+
+    if dfs(x, y):
+        for i in range(len(labyrinthe.grille)):
+            for j in range(len(labyrinthe.grille[i])):
+                if grid[i][j] == "P":
+                    grid[i][j] = 'b'
+
+    for i in range(len(labyrinthe.grille)):
+        labyrinthe.grille[i] = "".join(grid[i])
 
 def main():
     labyrinthe = Labyrinthe()
     joueur = Joueur()
     victoire_affichee = False
-    victoire_timer=None
+    victoire_timer = None
 
     clock = pygame.time.Clock()
 
@@ -115,47 +142,44 @@ def main():
             victoire_timer = pygame.time.get_ticks()
 
         if victoire_affichee:
-            if pygame.time.get_ticks()-victoire_timer>= 1000:
+            if pygame.time.get_ticks() - victoire_timer >= 1000:
                 pygame.quit()
                 sys.exit()
             else:
                 afficher_message_victoire(fenetre)
+
+        if touches[pygame.K_h]:  
+            resoudre_labyrinthe(labyrinthe, joueur.rect)
 
         pygame.display.flip()
         clock.tick(60)
 
 def menu():
     while True:
-        # Gestion des événements Pygame
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        # Affichage du menu
         fenetre.fill((0, 0, 0))
         font = pygame.font.Font(None, 36)
-        
-        # Modifier le titre
+
         title_text = font.render("Labyrinthe", True, (255, 255, 255))
         fenetre.blit(title_text, (largeur/2 - title_text.get_width()/2, 50))
-        
-        # Ajouter un bouton "Jouer"
+
         jouer_text = font.render("Jouer", True, (255, 255, 255))
         jouer_rect = jouer_text.get_rect(center=(largeur/2, 150))
         fenetre.blit(jouer_text, jouer_rect)
 
-        # Ajouter un bouton "Quitter"
         quitter_text = font.render("Quitter", True, (255, 0, 0))
         quitter_rect = quitter_text.get_rect(center=(largeur/2, 200))
         fenetre.blit(quitter_text, quitter_rect)
 
-        # Vérification des clics de souris
         mx, my = pygame.mouse.get_pos()
 
         if jouer_rect.collidepoint((mx, my)):
             if pygame.mouse.get_pressed()[0] == 1:
-                main()  # Lancer la fonction main()
+                main()
 
         if quitter_rect.collidepoint((mx, my)):
             if pygame.mouse.get_pressed()[0] == 1:
@@ -163,7 +187,6 @@ def menu():
                 sys.exit()
 
         pygame.display.update()
-
 
 if __name__ == "__main__":
     menu()
